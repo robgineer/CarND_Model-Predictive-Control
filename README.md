@@ -33,8 +33,8 @@ Where `Lf` represents a physical characteristic of the vecile  (the difference b
 
 ## N and dt
 
-The size of N and dt had a direct effect on the computational resources as these define the amout of computational steps to be performed. My approach therefore was to define values for `N` that do not exceed 20 as a big horizon would not necessarily increase the predicion performance. In fact my tests reveal that values exceeding 10 implied a bad polfit for velocities > 40mph and in case `dt` was set to 0.1 (which represents the delay covered below). 
-Since dt defines the amout of steps per horizon, and therefore, the resolution, it was epected that values 0.1 < `dt` would not be beneficial for the prediction as the resolution would imply a detailed trajectory but for a limited horizon. My final selection therefore was
+The size of N and dt had a direct effect on the computational resources as these define the amout of computational steps to be performed. My approach therefore was to define values for `N` that do not exceed 20 as a big horizon would not necessarily increase the predicion performance. In fact my tests reveal that values exceeding 10 implied a bad polyfit for velocities > 40mph and in case `dt` was set to 0.1 (which represents the delay mentioned below). 
+Since dt defines the amout of steps per horizon and therefore,the resolution, it was epected that values 0.1 < `dt` would not be beneficial for the prediction as the resolution would imply a detailed trajectory but for a limited horizon. My final selection therefore was
 
 ```
 N = 10 
@@ -47,7 +47,7 @@ The effect of the actuation delay resulted in a poor MPC behaviour as the vehicl
 In order to resolve these issues the tradidional approaches would be to either "speed up" the execution (latency decrease) or "slow down" the vehicle state estimation (by using one old state variables). 
 Another interesting approach mentioned within the Q&A and the intro of the project was to use the delay within the vehicle model.
 I have tried to implement this approach by simplyfying the the equation above with the assumption that no previous state variables are present and the current values for `x, y and psi` are `0` due to the previously performed transformation of the vehicles position into the vehicle`s coordinate system.
-Introducing a latency into the current state vector therefore implied a simple multiplication of the current state vector by the delay in seconds.
+Introducing a latency into the current state vector therefore implied a simple multiplication of the current state vector by the latency.
 
 ```
 px_delayed		= v * cos(psi) * latency
