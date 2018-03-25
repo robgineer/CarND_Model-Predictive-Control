@@ -41,12 +41,17 @@ N = 10
 dt = 0.1
 ```
 
+## Transformation of waypoints
+
+In order to simplify things, I have transformed the `x` and `y` values of the points that represent the reference trajectory into the vehicle's coordinate system. Hence, the resulting values for `x, y and psi` for the solver input were `0` prior to the latency handling described below.
+  
+
 ## Dealing with latency
 
 The effect of the actuation delay resulted in a poor MPC behaviour as the vehicle was following points on a trajectory that was not up to date. 
 In order to resolve these issues the tradidional approaches would be to either "speed up" the execution (latency decrease) or "slow down" the vehicle state estimation (by using one old state variables). 
 Another interesting approach mentioned within the Q&A and the intro of the project was to use the delay within the vehicle model.
-I have tried to implement this approach by simplyfying the the equation above with the assumption that no previous state variables are present and the current values for `x, y and psi` are `0` due to the previously performed transformation of the vehicles position into the vehicle`s coordinate system.
+I have tried to implement this approach by simplyfying the the equation above with the assumption that no previous state variables are present and the current values for `x, y and psi` are `0` due to the previously performed transformation of the vehicles position into the vehicle`s coordinate system (refer above).
 Introducing a latency into the current state vector therefore implied a simple multiplication of the current state vector by the latency.
 
 ```
