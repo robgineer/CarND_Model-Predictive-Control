@@ -11,8 +11,8 @@ double dt = 0.1;
 // Lf value (taken over from tutorial)
 const double Lf = 2.67;
 
-// The reference velocity is set to 40 mph.
-double ref_v = 100;
+// The reference velocity is set to 80 mph.
+double ref_v = 80;
 
 // Define positions of control inputs within the vars vector
 size_t x_start 		= 0;
@@ -50,9 +50,9 @@ class FG_eval {
 	  for(int t = 0; t < N; t++)
 	  {
 		  // CTE part of cost function for each horizon step
-		  fg[0] += 2000*CppAD::pow(vars[cte_start + t], 2);
+		  fg[0] += 5* CppAD::pow(vars[cte_start + t], 2);
 		  // Orientation error part of cost function for each horizon step
-		  fg[0] += 2000*CppAD::pow(vars[psi_start + t], 2);
+		  fg[0] += 5 * CppAD::pow(vars[psi_start + t], 2);
 		  // Velocity error part of cost function for each horizon step
 		  fg[0] += CppAD::pow(vars[v_start + t] - ref_v, 2);
 	  }
@@ -60,17 +60,17 @@ class FG_eval {
 	  // iterate through the horizon steps
 	  for (int t = 0; t < N - 1; t++)
 	  {
-		  fg[0] += 1000 * CppAD::pow(vars[delta_start + t], 2);
-		  fg[0] += 100 * CppAD::pow(vars[a_start + t], 2);
+		  fg[0] += 12000 * CppAD::pow(vars[delta_start + t], 2);
+		  fg[0] += CppAD::pow(vars[a_start + t], 2);
 	  }
 
 	  // Minimize the discretization error
 	  for (int t = 0; t < N - 2; t++)
 	  {
 		  // add a smooth delta between two steering actuation
-		  fg[0] += 3000 * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+		  fg[0] += CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
 		  // add a smooth delta between two throttle valve actuation
-	      fg[0] += 1000 * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+	      fg[0] += CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
 	  }
 
 	  // Set initial values for x, y, orientation, velocity, cte and psi error
@@ -97,12 +97,12 @@ class FG_eval {
 		  AD<double> x1 		= vars[x_start + t];
 	      AD<double> y1 		= vars[y_start + t];
 	      AD<double> psi1 	= vars[psi_start + t];
-	      AD<double> v1 		= vars[v_start + t];
+	      AD<double> v1 		= vars[v_start + t ];
 	      AD<double> cte1 	= vars[cte_start + t];
 	      AD<double> epsi1 	= vars[epsi_start + t];
 
 	      // Current steering actuation.
-	      AD<double> delta0 	= vars[delta_start + t - 1];
+	      AD<double> delta0	= vars[delta_start + t - 1];
 	      // Current throttle actuation.
 	      AD<double> a0 		= vars[a_start + t - 1];
 

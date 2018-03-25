@@ -85,15 +85,19 @@ int main() {
         string event = j[0].get<string>();
         if (event == "telemetry") {
           // j[1] is the data JSON object
-          vector<double> ptsx = j[1]["ptsx"];
-          vector<double> ptsy = j[1]["ptsy"];
-          double px = j[1]["x"];
-          double py = j[1]["y"];
-          double psi = j[1]["psi"];
-          double v = j[1]["speed"];
+          vector<double> ptsx 	= j[1]["ptsx"];
+          vector<double> ptsy 	= j[1]["ptsy"];
+          double px 				= j[1]["x"];
+          double py 				= j[1]["y"];
+          double psi 			= j[1]["psi"];
+          double v 				= j[1]["speed"];
+          // the following variables are necessary for the latency handling
+          double delta 			= j[1]["steering_angle"];
+          double a				= j[1]["throttle"];
 
 // ******************************************************************
 // the following code is based on the Q&A:
+          double Lf = 2.67;
 
           for(unsigned int i = 0; i < ptsx.size(); i++)
           {
@@ -120,8 +124,18 @@ int main() {
           double epsi = -atan(coeffs[1]);
 
           Eigen::VectorXd state(6);
+          double latency = 0.1;
 
-          state << 0,0,0,v,cte,epsi;
+          // handling latency
+          double px_delayed		= v * cos(0) * latency; //  == v * latency;
+          double py_delayed		= v * sin(0) * latency; // == 0
+          double psi_delayed 	= - v * delta / Lf * latency;
+          double v_delayed 		= v + a * latency;
+          double cte_delayed		= cte + v * sin(epsi) * latency;
+          double epsi_delayed	= epsi + psi_delayed;
+
+          //state << 0,0,0,v,cte,epsi;
+          state << px_delayed, py_delayed, psi_delayed, v_delayed, cte_delayed, epsi_delayed;
 
           auto vars = mpc.Solve(state, coeffs);
 
@@ -156,7 +170,7 @@ int main() {
 
           json msgJson;
 
-          double Lf = 2.67;
+
           // assign predicted steering angle and throttle to simulation
           msgJson["steering_angle"] 	= vars[0] / deg2rad(25);
           msgJson["throttle"] 		= vars[1] ;
